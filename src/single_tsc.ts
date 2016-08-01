@@ -71,10 +71,15 @@ export class SingleTsc extends Tsc {
     this.ngOptions.genDir = path.join(this.singleBasePath, this.ngOptions.genDir || '.');
     this.ngOptions.basePath = '.';
 
-    let compilerHost = ts.createCompilerHost(this.parsed.options);
+    try {
+      let compilerHost = ts.createCompilerHost(this.parsed.options);
 
-    let program = ts.createProgram(this.parsed.fileNames, this.parsed.options, compilerHost);
-    CodeGenerator.create(this.ngOptions, program, compilerHost).codegen();
+      let program = ts.createProgram(this.parsed.fileNames, this.parsed.options,
+          compilerHost);
+      CodeGenerator.create(this.ngOptions, program, compilerHost).codegen();
+    } catch (error) {
+      console.error(error);
+    }
 
     return this.parsedSingle;
   }
