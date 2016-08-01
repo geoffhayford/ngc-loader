@@ -14,6 +14,8 @@
     "./src/ngc_loader.ts",
     "./src/index.d.ts",
     "./node_modules/@angular/compiler-cli/index.d.ts",
-    "./node_modules/@angular/compiler-cli/main.d.ts"
+    "./node_modules/@angular/compiler-cli/src/main.d.ts",
+    "./node_modules/@angular/tsc-wrapped/index.d.ts",
+    "./node_modules/@angular/tsc-wrapped/src/main.d.ts"
   ]
 }
