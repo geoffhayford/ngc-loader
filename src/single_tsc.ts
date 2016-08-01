@@ -69,6 +69,13 @@ export class SingleTsc extends Tsc {
   	check(this.parsedSingle.diagnostics);
 
     this.ngOptions.genDir = path.join(this.singleBasePath, this.ngOptions.genDir || '.');
+    this.ngOptions.basePath = '.';
+
+    let compilerHost = ts.createCompilerHost(this.parsed.options);
+
+    let program = ts.createProgram(this.parsed.fileNames, this.parsed.options, compilerHost);
+    CodeGenerator.create(this.ngOptions, program, compilerHost).codegen();
+
     return this.parsedSingle;
   }
 }
