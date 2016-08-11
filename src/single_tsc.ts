@@ -68,7 +68,8 @@ export class SingleTsc extends Tsc {
   	this.parsedSingle = ts.transpileModule(source, this.parsed.options);
   	check(this.parsedSingle.diagnostics);
 
-    this.ngOptions.genDir = path.join(this.singleBasePath, this.ngOptions.genDir || '.');
+    this.ngOptions.genDir = this.ngOptions.genDir || '.';
+    console.log(this.ngOptions.genDir);
     this.ngOptions.basePath = '.';
 
     try {
