@@ -1,8 +1,10 @@
 import * as ts from 'typescript';
-import * as path from 'path';
-import {Tsc, check} from '@angular/compiler-cli/tsc';
-import {lstatSync} from 'fs';
-import {AngularCompilerOptions} from '@angular/compiler-cli/codegen';
+import {Tsc} from '@angular/tsc-wrapped/src/tsc';
+import {AngularCompilerOptions} from '@angular/tsc-wrapped';
+import {CodeGenerator} from '@angular/compiler-cli';
+
+var path = require('path');
+var fs = require('fs');
 
 const DEBUG = true;
 const SOURCE_EXTENSION = /\.[jt]s$/;
@@ -41,7 +43,7 @@ export class SingleTsc extends Tsc {
     this.singleBasePath = singleBasePath;
 
     // Allow a directory containing tsconfig.json as the project value
-    if (lstatSync(project).isDirectory()) {
+    if (fs.lstatSync(project).isDirectory()) {
       project = path.join(project, "tsconfig.json");
     }
 
@@ -49,8 +51,8 @@ export class SingleTsc extends Tsc {
     check([error]);
 
     this.parsed = ts.parseJsonConfigFileContent(
-      config, 
-      {readDirectory: ts.sys.readDirectory}, 
+      config,
+      ts.sys,
       singleBasePath
     );
 
@@ -63,10 +65,23 @@ export class SingleTsc extends Tsc {
   }
 
   recieveAndEmitSingle(source: string) {
-  	this.parsedSingle = ts.transpileModule(source, this.parsed.options); 
+  	this.parsedSingle = ts.transpileModule(source, this.parsed.options);
   	check(this.parsedSingle.diagnostics);
 
-    this.ngOptions.genDir = path.join(this.singleBasePath, this.ngOptions.genDir || '.');
+    this.ngOptions.genDir = this.ngOptions.genDir || '.';
+    console.log(this.ngOptions.genDir);
+    this.ngOptions.basePath = '.';
+
+    try {
+      let compilerHost = ts.createCompilerHost(this.parsed.options);
+
+      let program = ts.createProgram(this.parsed.fileNames, this.parsed.options,
+          compilerHost);
+      CodeGenerator.create(this.ngOptions, program, compilerHost).codegen();
+    } catch (error) {
+      console.error(error);
+    }
+
     return this.parsedSingle;
   }
 }
